@@ -7,10 +7,14 @@
 [Björn Ommer](https://hci.iwr.uni-heidelberg.de/Staff/bommer)<br/>
 \* equal contribution
 
-![realestate](assets/realestate_preview.gif)
-Videos: [RealEstate10K (2min)](assets/realestate_short.mp4) / [RealEstate10K (12min)](assets/realestate_long.mp4)
+### Interactive Scene Exploration Results
 
-![acid](assets/acid_preview.gif)
-Videos: [ACID (2min)](assets/acid_short.mp4) / [ACID (9min)](assets/acid_long.mp4)
+RealEstate10K:<br/>
+![realestate](assets/realestate_preview.gif)<br/>
+Videos: [short (2min)](assets/realestate_short.mp4) / [long (12min)](assets/realestate_long.mp4)
+
+ACID:<br/>
+![acid](assets/acid_preview.gif)<br/>
+Videos: [short (2min)](assets/acid_short.mp4) / [long (9min)](assets/acid_long.mp4)
 
 Code coming soon.
