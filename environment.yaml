@@ -1,0 +1,15 @@
+name: geofree
+channels:
+  - pytorch
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8.5
+  - pip=20.3
+  - cudatoolkit=10.1
+  - cudatoolkit-dev=10.1.243 # for nvcc
+  - gcc_linux-64=7.3.0 # for nvcc compatibility
+  - gxx_linux-64=7.3.0 # for nvcc compatibility
+  - pytorch=1.7.1
+  - torchvision=0.8.2
+  - numpy=1.19.2
