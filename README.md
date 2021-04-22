@@ -7,7 +7,7 @@
 [Björn Ommer](https://hci.iwr.uni-heidelberg.de/Staff/bommer)<br/>
 \* equal contribution
 
-[arXiv](https://arxiv.org/abs/2104.07652) | [BibTeX](#bibtex)
+[arXiv](https://arxiv.org/abs/2104.07652) | [BibTeX](#bibtex) | [Colab](https://colab.research.google.com/github/CompVis/geometry-free-view-synthesis/blob/master/scripts/braindance.ipynb)
 
 ### Interactive Scene Exploration Results
 
@@ -20,6 +20,11 @@ Videos: [short (2min)](assets/realestate_short.mp4) / [long (12min)](assets/real
 Videos: [short (2min)](assets/acid_short.mp4) / [long (9min)](assets/acid_long.mp4)
 
 ### Demo
+
+For a quickstart, you can try the [Colab
+demo](https://colab.research.google.com/github/CompVis/geometry-free-view-synthesis/blob/master/scripts/braindance.ipynb),
+but for a smoother experience we recommend installing the local demo as
+described below.
 
 #### Installation
 
