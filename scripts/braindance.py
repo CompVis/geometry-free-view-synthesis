@@ -27,7 +27,10 @@ def to_surface(x, text=None):
     if text is not None:
         from PIL import ImageDraw, ImageFont
         fontsize=22
-        font = ImageFont.truetype("/usr/share/fonts/liberation/LiberationSans-BoldItalic.ttf", fontsize)
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/liberation/LiberationSans-BoldItalic.ttf", fontsize)
+        except OSError:
+            font = ImageFont.load_default()
         margin = 8
 
         x = x.transpose(1,0,2)
