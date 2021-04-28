@@ -15,6 +15,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+from geofree.main import instantiate_from_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -259,6 +261,44 @@ class CodeGPT(nn.Module):
         return logits, loss
 
 
+class WarpGPT(GPT):
+    """  the full GPT language model, with a context size of block_size """
+    def __init__(self, **kwargs):
+        assert "n_unmasked" in kwargs and kwargs["n_unmasked"] != 0
+        warper_config = kwargs.pop("warper_config")
+        if warper_config.params is None:
+            warper_config.params = dict()
+        warper_config.params["n_unmasked"] = kwargs["n_unmasked"]
+        warper_config.params["block_size"] = kwargs["block_size"]
+        warper_config.params["n_embd"] = kwargs["n_embd"]
+        super().__init__(**kwargs)
+        self.warper = instantiate_from_config(warper_config)
+
+    def forward(self, idx, warpkwargs, embeddings=None, targets=None):
+        # forward the GPT model
+        token_embeddings = self.tok_emb(idx) # each index maps to a (learnable) vector
+
+        if embeddings is not None:  # prepend explicit embeddings
+            token_embeddings = torch.cat((embeddings, token_embeddings), dim=1)
+
+        t = token_embeddings.shape[1]
+        assert t <= self.block_size, "Cannot forward, model block size is exhausted."
+        position_embeddings = self.pos_emb[:, :t, :] # each position maps to a (learnable) vector
+
+        token_embeddings, position_embeddings = self.warper(token_embeddings,
+                                                            position_embeddings,
+                                                            warpkwargs)
+
+        x = self.drop(token_embeddings + position_embeddings)
+        x = self.blocks(x)
+        x = self.ln_f(x)
+        logits = self.head(x)
+
+        # if we are given some desired targets also calculate the loss
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+        return logits, loss
 
 #### sampling utils
 

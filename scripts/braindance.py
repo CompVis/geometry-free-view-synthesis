@@ -141,6 +141,12 @@ class Renderer(object):
         self.model = pretrained_models(model=model)
         self.model = self.model.to(device=device)
         self._active = False
+        # rough estimates for min and maximum inverse depth values on the
+        # training datasets
+        if model.startswith("re"):
+            self.scale = [0.18577382, 0.93059154]
+        else:
+            self.scale = [1e-8, 0.75]
 
     def init(self,
              start_im,
@@ -160,7 +166,8 @@ class Renderer(object):
         for k in edict:
             edict[k] = edict[k].to(device=self.model.device)
 
-        quant_d, quant_c, dc_indices, embeddings = self.model.get_normalized_c(cdict,edict,fixed_scale=True)
+        quant_d, quant_c, dc_indices, embeddings = self.model.get_normalized_c(
+            cdict, edict, fixed_scale=True, scale=self.scale)
 
         start_im = start_im[None,...].to(self.model.device).permute(0,3,1,2)
         quant_c, c_indices = self.model.encode_to_c(c=start_im)
@@ -211,7 +218,7 @@ class Renderer(object):
         return x_rec.permute(0,2,3,1)
 
 
-def load_as_example(path):
+def load_as_example(path, model="re"):
     size = [208, 368]
     im = Image.open(path)
     w,h = im.size
@@ -238,9 +245,16 @@ def load_as_example(path):
 
     example = dict()
     example["src_img"] = im
-    example["K"] = np.array([[184.0, 0.0, 184.0],
-                             [0.0, 184.0, 104.0],
-                             [0.0, 0.0, 1.0]], dtype=np.float32)
+    if model.startswith("re"):
+        example["K"] = np.array([[184.0, 0.0, 184.0],
+                                 [0.0, 184.0, 104.0],
+                                 [0.0, 0.0, 1.0]], dtype=np.float32)
+    elif model.startswith("ac"):
+        example["K"] = np.array([[200.0, 0.0, 184.0],
+                                 [0.0, 200.0, 104.0],
+                                 [0.0, 0.0, 1.0]], dtype=np.float32)
+    else:
+        raise NotImplementedError()
     example["K_inv"] = np.linalg.inv(example["K"])
 
     ## dummy data not used during inference
@@ -265,7 +279,8 @@ if __name__ == "__main__":
     parser.add_argument('path', type=str, nargs='?', default=None,
                         help='path to image or directory from which to select '
                         'image. Default example is used if not specified.')
-    parser.add_argument('--model', choices=["re_impl_nodepth", "re_impl_depth"],
+    parser.add_argument('--model', choices=["re_impl_nodepth", "re_impl_depth",
+                                            "ac_impl_nodepth", "ac_impl_depth"],
                         default="re_impl_nodepth",
                         help='pretrained model to use.')
     parser.add_argument('--video', type=str, nargs='?', default=None,
@@ -288,14 +303,15 @@ if __name__ == "__main__":
         except ImportError:
             import importlib_resources as pkg_resources
 
-        with pkg_resources.path("geofree.examples", "artist.jpg") as path:
-            example = load_as_example(path)
+        example_name = "artist.jpg" if opt.model.startswith("re") else "beach.jpg"
+        with pkg_resources.path("geofree.examples", example_name) as path:
+            example = load_as_example(path, model=opt.model)
     else:
         path = opt.path
         if not os.path.isfile(path):
             Tk().withdraw()
             path = askopenfilename(initialdir=sys.argv[1])
-        example = load_as_example(path)
+        example = load_as_example(path, model=opt.model)
 
     ims = example["src_img"][None,...]
     K = example["K"]
@@ -304,7 +320,9 @@ if __name__ == "__main__":
     dms = [None]
     for i in range(ims.shape[0]):
         midas_in = torch.tensor(ims[i])[None,...].permute(0,3,1,2).to(device)
-        scaled_idepth = midas.fixed_scale_depth(midas_in, return_inverse_depth=True)
+        scaled_idepth = midas.fixed_scale_depth(midas_in,
+                                                return_inverse_depth=True,
+                                                scale=renderer.scale)
         dms[i] = 1.0/scaled_idepth[0].cpu().numpy()
 
     # now switch to pytorch
@@ -339,6 +357,11 @@ if __name__ == "__main__":
     CAM_SPEED_PITCH = 0.25
     MOUSE_SENSITIVITY = 0.02
     USE_MOUSE = False
+    if opt.model.startswith("ac"):
+        CAM_SPEED *= 0.1
+        CAM_SPEED_YAW *= 0.5
+        CAM_SPEED_PITCH *= 0.5
+
     if opt.video is not None:
         writer = imageio.get_writer(opt.video, fps=40)
 

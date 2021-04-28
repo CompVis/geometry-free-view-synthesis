@@ -24,5 +24,6 @@ setup(
         'importlib-resources',
         'imageio',
         'imageio-ffmpeg',
+        'test-tube'
     ],
 )

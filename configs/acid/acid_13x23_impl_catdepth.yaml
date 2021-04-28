@@ -1,0 +1,128 @@
+model:
+  base_learning_rate: 0.0625
+  target: geofree.models.transformers.geogpt.GeoTransformer
+  params:
+    merge_channels: null
+
+    plot_cond_stage: True
+    monitor: "val/loss"
+
+    use_scheduler: True
+    scheduler_config:
+      target: geofree.lr_scheduler.LambdaWarmUpCosineScheduler
+      params:
+        verbosity_interval: 0   # 0 or negative to disable
+        warm_up_steps: 5000
+        max_decay_steps: 500001
+        lr_start: 2.5e-6
+        lr_max: 1.5e-4
+        lr_min: 1.0e-8
+
+    transformer_config:
+      target: geofree.modules.transformer.mingpt.GPT
+      params:
+        vocab_size: 16384
+        block_size: 926 # conditioning + 299 - 1
+        n_unmasked: 628 # 30 camera embeddings + 299 depth and 299 cond embeddings
+        n_layer: 32
+        n_head: 16
+        n_embd: 1024
+
+    first_stage_key:
+      x: "dst_img"
+
+    cond_stage_key:
+      c: "src_img"
+
+    emb_stage_key:
+      points: "src_points"
+      R: "R_rel"
+      t: "t_rel"
+      K: "K"
+      K_inv: "K_inv"
+
+    first_stage_config:
+      target: geofree.models.vqgan.VQModel
+      params:
+        ckpt_path: "pretrained_models/acid_first_stage/last.ckpt"
+        embed_dim: 256
+        n_embed: 16384
+        ddconfig:
+          double_z: False
+          z_channels: 256
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult: [ 1,1,2,2,4 ]  # num_down = len(ch_mult)-1
+          num_res_blocks: 2
+          attn_resolutions: [ 16 ]
+          dropout: 0.0
+        lossconfig:
+          target: geofree.modules.losses.vqperceptual.DummyLoss
+
+    cond_stage_config: "__is_first_stage__"
+
+    depth_stage_config:
+      target: geofree.models.vqgan.VQModel
+      params:
+        ckpt_path: "pretrained_models/acid_depth_stage/last.ckpt"
+        embed_dim: 256
+        n_embed: 1024
+        ddconfig:
+          double_z: false
+          z_channels: 256
+          resolution: 256
+          in_channels: 1
+          out_ch: 1
+          ch: 128
+          ch_mult:
+          - 1
+          - 1
+          - 2
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions:
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: geofree.modules.losses.vqperceptual.DummyLoss
+
+    emb_stage_config:
+      target: geofree.modules.util.MultiEmbedder
+      params:
+        keys:
+          - "R"
+          - "t"
+          - "K"
+          - "K_inv"
+        n_positions: 30
+        n_channels: 1
+        n_embed: 1024
+        bias: False
+
+data:
+  target: geofree.main.DataModuleFromConfig
+  params:
+    # bs 4 and accumulate_grad_batches 4 for 34gb vram
+    batch_size: 4
+    num_workers: 8
+    train:
+      target: geofree.data.acid.ACIDSparseTrain
+      params:
+        size:
+          - 208
+          - 368
+
+    validation:
+      target: geofree.data.acid.ACIDCustomTest
+      params:
+        size:
+          - 208
+          - 368
+
+lightning:
+  trainer:
+    accumulate_grad_batches: 4
+    benchmark: True

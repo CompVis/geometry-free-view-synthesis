@@ -1,0 +1,85 @@
+model:
+  base_learning_rate: 0.0625
+  target: geofree.models.transformers.net2net.WarpingFeatureTransformer
+  params:
+    plot_cond_stage: True
+    monitor: "val/loss"
+
+    use_scheduler: True
+    scheduler_config:
+      target: geofree.lr_scheduler.LambdaWarmUpCosineScheduler
+      params:
+        verbosity_interval: 0   # 0 or negative to disable
+        warm_up_steps: 5000
+        max_decay_steps: 500001
+        lr_start: 2.5e-6
+        lr_max: 1.5e-4
+        lr_min: 1.0e-8
+
+    transformer_config:
+      target: geofree.modules.transformer.mingpt.GPT
+      params:
+        vocab_size: 16384
+        block_size: 597 # conditioning + 299 - 1
+        n_unmasked: 299 # 299 cond embeddings
+        n_layer: 32
+        n_head: 16
+        n_embd: 1024
+
+    first_stage_key:
+      x: "dst_img"
+
+    cond_stage_key:
+      c: "src_img"
+      points: "src_points"
+      R: "R_rel"
+      t: "t_rel"
+      K: "K"
+      K_inv: "K_inv"
+
+    first_stage_config:
+      target: geofree.models.vqgan.VQModel
+      params:
+        ckpt_path: "pretrained_models/realestate_first_stage/last.ckpt"
+        embed_dim: 256
+        n_embed: 16384
+        ddconfig:
+          double_z: False
+          z_channels: 256
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult: [ 1,1,2,2,4 ]  # num_down = len(ch_mult)-1
+          num_res_blocks: 2
+          attn_resolutions: [ 16 ]
+          dropout: 0.0
+        lossconfig:
+          target: geofree.modules.losses.vqperceptual.DummyLoss
+
+    cond_stage_config: "__is_first_stage__"
+
+data:
+  target: geofree.main.DataModuleFromConfig
+  params:
+    # bs 8 and accumulate_grad_batches 2 for 34gb vram
+    batch_size: 8
+    num_workers: 16
+    train:
+      target: geofree.data.realestate.RealEstate10KSparseTrain
+      params:
+        size:
+          - 208
+          - 368
+
+    validation:
+      target: geofree.data.realestate.RealEstate10KCustomTest
+      params:
+        size:
+          - 208
+          - 368
+
+lightning:
+  trainer:
+    accumulate_grad_batches: 2
+    benchmark: True

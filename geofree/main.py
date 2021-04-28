@@ -332,7 +332,7 @@ if __name__ == "__main__":
     #   params:
     #       key: value
     # data:
-    #   target: cutlit.DataModuleFromConfig
+    #   target: geofree.main.DataModuleFromConfig
     #   params:
     #      batch_size: int
     #      wrap: bool
@@ -364,8 +364,8 @@ if __name__ == "__main__":
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
     # add cwd for convenience and to make classes in this file available when
-    # running as `python cutlit.py`
-    # (in particular `cutlit.DataModuleFromConfig`)
+    # running as `python geofree/main.py`
+    # (in particular `geofree.main.DataModuleFromConfig`)
     sys.path.append(os.getcwd())
 
     parser = get_parser()
@@ -491,7 +491,7 @@ if __name__ == "__main__":
         # add callback which sets up log directory
         default_callbacks_cfg = {
             "setup_callback": {
-                "target": "cutlit.SetupCallback",
+                "target": "geofree.main.SetupCallback",
                 "params": {
                     "resume": opt.resume,
                     "now": now,
@@ -503,7 +503,7 @@ if __name__ == "__main__":
                 }
             },
             "image_logger": {
-                "target": "cutlit.ImageLogger",
+                "target": "geofree.main.ImageLogger",
                 "params": {
                     "batch_frequency": 750,
                     "max_images": 4,
@@ -511,10 +511,9 @@ if __name__ == "__main__":
                 }
             },
             "learning_rate_logger": {
-                "target": "cutlit.LearningRateMonitor",
+                "target": "geofree.main.LearningRateMonitor",
                 "params": {
                     "logging_interval": "step",
-                    #"log_momentum": True
                 }
             },
         }
@@ -523,7 +522,7 @@ if __name__ == "__main__":
         trainer_kwargs["callbacks"] = [instantiate_from_config(callbacks_cfg[k]) for k in callbacks_cfg]
 
         trainer = Trainer.from_argparse_args(trainer_opt, **trainer_kwargs)
-        trainer.logdir = logdir  ###
+        trainer.logdir = logdir
 
         # data
         data = instantiate_from_config(config.data)

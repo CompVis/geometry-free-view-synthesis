@@ -1,7 +1,6 @@
-import os, hashlib
+import hashlib
 import requests
 from tqdm import tqdm
-import numpy as np
 import torch
 import os
 from omegaconf import OmegaConf
@@ -17,6 +16,12 @@ URL_MAP = {
     "re_impl_depth": "https://heibox.uni-heidelberg.de/f/740100d4cdbd46d4bb39/?dl=1",
     "re_impl_nodepth_config": "https://heibox.uni-heidelberg.de/f/21989b42cea544bbbb9e/?dl=1",
     "re_impl_nodepth": "https://heibox.uni-heidelberg.de/f/b909c3d4ac7143209387/?dl=1",
+    "ac_first_stage": "https://heibox.uni-heidelberg.de/f/f21118f64fde4134917b/?dl=1",
+    "ac_depth_stage": "https://heibox.uni-heidelberg.de/f/fd4bd78496884990b75e/?dl=1",
+    "ac_impl_depth_config": "https://heibox.uni-heidelberg.de/f/6e3081df54e245cd9aaa/?dl=1",
+    "ac_impl_depth": "https://heibox.uni-heidelberg.de/f/6e3081df54e245cd9aaa/?dl=1",
+    "ac_impl_nodepth_config": "https://heibox.uni-heidelberg.de/f/0a2749e895784c0099a4/?dl=1",
+    "ac_impl_nodepth": "https://heibox.uni-heidelberg.de/f/bead9082ed0c425fb6b4/?dl=1",
 }
 
 CKPT_MAP = {
@@ -27,6 +32,12 @@ CKPT_MAP = {
     "re_impl_depth": "geofree/re_impl_depth/last.ckpt",
     "re_impl_nodepth_config": "geofree/re_impl_nodepth/config.yaml",
     "re_impl_nodepth": "geofree/re_impl_nodepth/last.ckpt",
+    "ac_first_stage": "geofree/ac_first_stage/last.ckpt",
+    "ac_depth_stage": "geofree/ac_depth_stage/last.ckpt",
+    "ac_impl_depth_config": "geofree/ac_impl_depth/config.yaml",
+    "ac_impl_depth": "geofree/ac_impl_depth/last.ckpt",
+    "ac_impl_nodepth_config": "geofree/ac_impl_nodepth/config.yaml",
+    "ac_impl_nodepth": "geofree/ac_impl_nodepth/last.ckpt",
 }
 CACHE = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
 CKPT_MAP = dict((k, os.path.join(CACHE, CKPT_MAP[k])) for k in CKPT_MAP)
@@ -39,6 +50,12 @@ MD5_MAP = {
     "re_impl_depth": "144dcdeb1379760d2f1ae763cabcac85",
     "re_impl_nodepth_config": "351c976463c4740fc575a7c64a836624",
     "re_impl_nodepth": "b6646db26a756b80840aa2b6aca924d8",
+    "ac_first_stage": "657f683698477be24254b2be85fbced0",
+    "ac_depth_stage": "e75ef829cf72be4f5f252450bdeb10db",
+    "ac_impl_depth_config": "79b38a57fe4a195165a79c795492092c",
+    "ac_impl_depth": "e92673e24acb28977d74a2fc106bcfb1",
+    "ac_impl_nodepth_config": "22e1a55122cef561597cc5c040d45fba",
+    "ac_impl_nodepth": "22e1a55122cef561597cc5c040d45fba",
 }
 
 
@@ -72,12 +89,13 @@ def get_local_path(name, root=None, check=False):
 
 
 def pretrained_models(model="re_impl_nodepth"):
-    assert model.startswith("re_"), "not implemented"
+    prefix = model[:2]
+    assert prefix in ["re", "ac"], "not implemented"
 
     config_path = get_local_path(model+"_config")
     config = OmegaConf.load(config_path)
-    config.model.params.first_stage_config.params["ckpt_path"] = get_local_path("re_first_stage")
-    config.model.params.depth_stage_config.params["ckpt_path"] = get_local_path("re_depth_stage")
+    config.model.params.first_stage_config.params["ckpt_path"] = get_local_path(f"{prefix}_first_stage")
+    config.model.params.depth_stage_config.params["ckpt_path"] = get_local_path(f"{prefix}_depth_stage")
 
     ckpt_path = get_local_path(model)
 
