@@ -1,0 +1,165 @@
+<div class="image fit captioned align-just">
+<div class="videocontainer">
+<video controls class="videothing">
+<source src="images/inthewild.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+Synthesizing novel views on scenes in the wild.
+</div>
+==========
+<div class="image fit captioned align-just">
+<div class="videocontainer">
+<video controls class="videothing">
+<source src="images/rabbithole.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+Endless scene exploration by running our approach iteratively.
+</div>
+==========
+<div class="image fit captioned align-just">
+<div class="videocontainer">
+<video controls class="videothing">
+<source src="images/realestate_short.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+Short (2 min) comparison on RealEstate10K. See also <a href="https://github.com/CompVis/geometry-free-view-synthesis/blob/master/assets/realestate_long.mp4">long version</a> (12 min).
+</div>
+==========
+<div class="image fit captioned align-just">
+<div class="videocontainer">
+<video controls class="videothing">
+<source src="images/acid_short.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+Short (2 min) comparison on ACID. See also <a href="https://github.com/CompVis/geometry-free-view-synthesis/blob/master/assets/acid_long.mp4">long version</a> (9 min).
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure2-1.jpg">
+<img src="images/article-Figure2-1.jpg" alt="" />
+</a>
+Figure 2. We formulate novel view synthesis as sampling from the distribution p(xdst|xsrc, T ) of target images xdst for a given source image xsrc and camera change T . We use a VQGAN to model this distribution autoregressively with a transformer and introduce a conditioning function f(xsrc, T ) to encode inductive biases into our model. We analyze explicit variants, which estimate scene depth d and warp source features into the novel view, as well as implicit variants without such a warping. The table on the right summarizes the variants for f .
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Table1-1.jpg">
+<img src="images/article-Table1-1.jpg" alt="" />
+</a>
+Table 1. To assess the effect of encoding different degrees of 3D prior knowledge, we evaluate all variants on RealEstate and ACID using negative log-likelihood (NLL), FID [28] and PSIM [75], PSNR and SSIM [70]. We highlight best, second best and third best scores.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure3-1.jpg">
+<img src="images/article-Figure3-1.jpg" alt="" />
+</a>
+Figure 3. Average reconstruction error of the best sample as a function of the number of samples on RealEstate. With just four samples, impl.-depth reaches state-of-the-art performance in two out of three metrics, and with 16 samples in all three of them.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure4-1.jpg">
+<img src="images/article-Figure4-1.jpg" alt="" />
+</a>
+Figure 4. Visualization of the entropy of the predicted target code distribution for impl.-nodepth. Increased confidence (darker colors) in regions which are visible in the source image indicate its ability to relate source and target geometrically, without 3D bias.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Table2-1.jpg">
+<img src="images/article-Table2-1.jpg" alt="" />
+</a>
+Table 2. Quantitative comparison on RealEstate. Reconstruction metrics are reported with 32 samples, see Fig. 3 for other values. Our implicit variants outperform previous approach in all metrics except for IS, with drastic improvements for FID.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure5-1.jpg">
+<img src="images/article-Figure5-1.jpg" alt="" />
+</a>
+Figure 5. Qualitative Results on RealEstate10K: We compare three deterministic convolutional baselines (3DPhoto [59], SynSin [71], expl.-det) to our implicit variants impl.-depth and impl.-nodepth. Ours is able to synthesize plausible novel views, whereas others produce artifacts or blurred, uniform areas. The depicted target is only one of many possible realizations; we visualize samples in the supplement.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Table3-1.jpg">
+<img src="images/article-Table3-1.jpg" alt="" />
+</a>
+Table 3. Quantitative comparison on ACID using 32 samples for reconstruction metrics. We indicate number of steps used for InfNat [37] in parentheses. Our impl.-depth approach outperforms previous works in all metrics except for IS.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure6-1.jpg">
+<img src="images/article-Figure6-1.jpg" alt="" />
+</a>
+Figure 6. Qualitative Results on ACID: The outdoor setting of the ACID dataset yields similar results as the indoor setting in Fig. 5. Here, we evaluate against the baselines 3DPhoto [59], InfNat [37] and expl.-det. For InfNat [37], we use 5 steps to synthesize a novel view.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure7-1.jpg">
+<img src="images/article-Figure7-1.jpg" alt="" />
+</a>
+Figure 7. Minimal validation loss and reconstruction quality of depth predictions obtained from linear probing as a function of different transformer layers. The probed variant is impl.-nodepth.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure8-1.jpg">
+<img src="images/article-Figure8-1.jpg" alt="" />
+</a>
+Figure 8. Linearly probed depth maps for different transformer layer. The results mirror the curve in Fig. 7: After a strong initial increase, the quality for layer 4 is best. The depth reconstructions in the right column provide an upper bound on achievable quality.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure9-1.jpg">
+<img src="images/article-Figure9-1.jpg" alt="" />
+</a>
+Figure 9. Preview of the videos available at https://git.io/JOnwn, which demonstrate an interface for interactive 3D exploration of images. Starting from a single image, it allows users to freely move around in 3D. See also Sec. A.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure10-1.jpg">
+<img src="images/article-Figure10-1.jpg" alt="" />
+</a>
+Figure 10. Negative log-likelihood over the course of training on RealEstate10K (left) and ACID (right). Implicit variants achieve the best results, see Sec. 4.1 for a discussion.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure11-1.jpg">
+<img src="images/article-Figure11-1.jpg" alt="" />
+</a>
+Figure 11. Additional qualitative comparisons on RealEstate10K.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure12-1.jpg">
+<img src="images/article-Figure12-1.jpg" alt="" />
+</a>
+Figure 12. Additional samples on RealEstate10K. The second column depicts the pixel-wise standard deviation σ obtained from n = 32 samples.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure13-1.jpg">
+<img src="images/article-Figure13-1.jpg" alt="" />
+</a>
+Figure 13. Additional qualitative comparisons on ACID.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure14-1.jpg">
+<img src="images/article-Figure14-1.jpg" alt="" />
+</a>
+Figure 14. Additional samples on ACID. The second column depicts the pixel-wise standard deviation σ obtained from n = 32 samples.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure15-1.jpg">
+<img src="images/article-Figure15-1.jpg" alt="" />
+</a>
+Figure 15. Additional results on linearly probed depth maps for different transformer layers as in Fig. 8. See Sec. 4.3.
+</div>
+==========
+<div class="image fit captioned align-just">
+<a href="images/article-Figure16-1.jpg">
+<img src="images/article-Figure16-1.jpg" alt="" />
+</a>
+Figure 16. Additional visualizations of the entropy of the predicted target code distribution for impl.-nodepth. Increased confidence (darker colors) in regions which are visible in the source image indicate its ability to relate source and target geometrically, without 3D bias. See also Sec. 4.1 and Sec. D.
+</div>
